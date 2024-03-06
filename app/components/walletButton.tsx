@@ -26,13 +26,17 @@ export default function WalletButton() {
       const [account] = await walletClient.getAddresses();
       console.log(account);
 
-      const signature = await login(walletClient, account);
+      if (localStorage.getItem("signature") === null) {
+        const signature = await login(walletClient, account);
 
-      console.log(signature);
+        console.log(signature);
+        // signature 存缓存
+        localStorage.setItem("signature", signature);
 
-      const account1 = await verifySignature(LoginMessage, signature);
+        const account1 = await verifySignature(LoginMessage, signature);
 
-      console.log("Success: ", account == account1);
+        console.log("Success: ", account == account1);
+      }
 
       const balance = await publicClient.getBalance({ address: account });
 

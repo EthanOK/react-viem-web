@@ -2,13 +2,14 @@
 
 import { parseEther } from "viem";
 import { DefaultChainId, Receiver } from "../config";
-import { ConnectWalletClient } from "../hooks/client";
+import { ConnectPublicClient, ConnectWalletClient } from "../hooks/client";
 import getChain from "../hooks/getChain";
 
 export default function SendTXButton() {
   async function handleClick() {
     try {
       const walletClient = ConnectWalletClient();
+      const publicClient = ConnectPublicClient();
 
       // Change Chain
       await walletClient.switchChain({ id: DefaultChainId });
@@ -26,7 +27,11 @@ export default function SendTXButton() {
 
       console.log("Tx Hash: ", hash);
 
-      alert(`Transaction successful. Transaction Hash: ${hash}`);
+      const transactionR = await publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      alert(`Transaction status: ${transactionR.status}`);
     } catch (error) {
       alert(`Transaction failed: ${error}`);
     }
