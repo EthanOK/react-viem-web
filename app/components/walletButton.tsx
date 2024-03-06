@@ -2,19 +2,26 @@
 import { useState } from "react";
 import { ConnectPublicClient, ConnectWalletClient } from "../hooks/client";
 import login, { verifySignature } from "../hooks/login";
-import { LoginMessage } from "../config";
+import { DefaultChainId, LoginMessage } from "../config";
 
 export default function WalletButton() {
   const [account, setAccount] = useState<string | null>(null);
   const [balance, setBalance] = useState(BigInt(0));
+  const [chainId, setChainId] = useState<number | null>(null);
 
   async function handleClick() {
     try {
       const walletClient = ConnectWalletClient();
       const publicClient = ConnectPublicClient();
 
+      // Change Chain
+      await walletClient.switchChain({ id: DefaultChainId });
       // Must: 此 API 对于需要访问用户帐户以执行交易或与智能合约交互的 dapp 非常有用。
       await walletClient.requestAddresses();
+
+      const chainId = await walletClient.getChainId();
+
+      setChainId(chainId);
 
       const [account] = await walletClient.getAddresses();
       console.log(account);
@@ -38,7 +45,7 @@ export default function WalletButton() {
 
   return (
     <>
-      <Status address={account} balance={balance} />
+      <Status chainId={chainId} address={account} balance={balance} />
       <button
         className="px-8 py-2 rounded-md bg-[#1e2124] flex flex-row items-center justify-center border border-[#1e2124] hover:border hover:border-indigo-600 shadow-md shadow-indigo-500/10"
         onClick={handleClick}
@@ -55,9 +62,11 @@ export default function WalletButton() {
 }
 
 function Status({
+  chainId,
   address,
   balance,
 }: {
+  chainId: number | null;
   address: string | null;
   balance: BigInt;
 }) {
@@ -73,7 +82,11 @@ function Status({
     <div className="flex items-center w-full">
       <div className="border bg-green-500 border-green-500 rounded-full w-1.5 h-1.5 mr-2"></div>
       <div className="text-xs md:text-xs">
-        Account: {address} <br /> Balance: {balance.toString()}
+        ChainId:{chainId}
+        <br />
+        Account: {address}
+        <br />
+        Balance: {balance.toString()}
       </div>
     </div>
   );

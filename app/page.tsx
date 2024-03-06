@@ -1,3 +1,4 @@
+import SendTXButton from "./components/sendTransaction";
 import WalletButton from "./components/walletButton";
 // import MintButton from "./mintButton";
 // import SendButton from "./sendButton";
@@ -16,6 +17,7 @@ export default function Home() {
         </a>
         <div className="h-[300px] min-w-[150px] flex flex-col justify-between  backdrop-blur-2xl bg-[#290330]/30 rounded-lg mx-auto p-7 text-white border border-purple-950">
           <WalletButton />
+          <SendTXButton />
           {/* <SendButton />
                               <MintButton /> */}
         </div>
